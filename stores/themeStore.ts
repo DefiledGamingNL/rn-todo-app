@@ -1,3 +1,7 @@
+import {create} from "zustand";
+import {createJSONStorage, persist} from "zustand/middleware";
+import * as SecureStore from "expo-secure-store";
+
 export interface ColorScheme {
     bg: string;
     surface: string;
@@ -26,7 +30,7 @@ export interface ColorScheme {
     statusBarStyle: "light-content" | "dark-content";
 }
 
-export const lightColors: ColorScheme = {
+const lightColors: ColorScheme = {
     bg: "#f8fafc",
     surface: "#ffffff",
     text: "#1e293b",
@@ -51,10 +55,10 @@ export const lightColors: ColorScheme = {
         input: "#ffffff",
         editInput: "#ffffff",
     },
-    statusBarStyle: "dark-content" as const,
+    statusBarStyle: "dark-content",
 };
 
-export const darkColors: ColorScheme = {
+const darkColors: ColorScheme = {
     bg: "#0f172a",
     surface: "#1e293b",
     text: "#f1f5f9",
@@ -79,5 +83,41 @@ export const darkColors: ColorScheme = {
         input: "#1e293b",
         editInput: "#0f172a",
     },
-    statusBarStyle: "light-content" as const,
+    statusBarStyle: "light-content",
 };
+
+interface ThemeState {
+    isDarkMode: boolean;
+    colors: ColorScheme;
+    toggleDarkMode: () => void;
+    setDarkMode: (enabled: boolean) => void;
+}
+
+export const useThemeStore = create<ThemeState>()(
+    persist(
+        (set, get) => ({
+            isDarkMode: false,
+            colors: lightColors,
+            toggleDarkMode: () => {
+                const newMode = !get().isDarkMode;
+                set({
+                    isDarkMode: newMode,
+                    colors: newMode ? darkColors : lightColors,
+                });
+            },
+            setDarkMode: (enabled) =>
+                set({
+                    isDarkMode: enabled,
+                    colors: enabled ? darkColors : lightColors,
+                }),
+        }),
+        {
+            name: "theme-store",
+            storage: createJSONStorage(() => ({
+                getItem: (key) => SecureStore.getItemAsync(key),
+                setItem: (key, value) => SecureStore.setItemAsync(key, value),
+                removeItem: (key) => SecureStore.deleteItemAsync(key),
+            }))
+        }
+    )
+);
