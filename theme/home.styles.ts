@@ -1,5 +1,5 @@
-import { ColorScheme } from "@/theme/colorScheme";
-import { StyleSheet } from "react-native";
+import {ColorScheme} from "@/theme/colorScheme";
+import {StyleSheet} from "react-native";
 
 export const createHomeStyles = (colors: ColorScheme) => {
     const styles = StyleSheet.create({
@@ -42,14 +42,14 @@ export const createHomeStyles = (colors: ColorScheme) => {
             flex: 1,
         },
         title: {
-            fontSize: 32,
+            fontSize: 24,
             fontWeight: "700",
             letterSpacing: -1,
             marginBottom: 4,
             color: colors.text,
         },
         subtitle: {
-            fontSize: 17,
+            fontSize: 15,
             fontWeight: "500",
             color: colors.textMuted,
         },
